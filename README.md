@@ -1,51 +1,149 @@
-# City Data Processing Project
+# Data Processing Module
 
-This project demonstrates how to load and process city data from a CSV file using two custom classes: `DataLoader` and `Table`. The program filters cities by conditions, performs aggregations such as averages and maximum values, and counts unique country entries.
+This repository contains the Python module **`data_processing.py`**, designed to help with loading CSV files, organizing them into table-like structures, performing filtering, and computing aggregated statistics.  
+Below is an expanded and detailed explanation of every component in the script so you can clearly understand how each part works.
 
-## Project Structure
+---
 
-project_folder/
-- Cities.csv (data file that contains city information)
-- main.py (main program code)
-- README.md (this documentation)
+##  Overview
 
-## How It Works
+The module includes:
 
-1. **DataLoader Class**
-   The `DataLoader` class loads data from a CSV file and returns it as a list of dictionaries. Each dictionary represents one row from the CSV.
+1. **DataLoader** – Reads CSV files into Python structures.
+2. **Table** – A lightweight table processor for filtering, printing, and aggregating.
+3. **Example Workflow** – Demonstrates how these classes are intended to be used.
 
-2. **Table Class**
-   The `Table` class stores a dataset and provides tools for:
-   - `filter(condition)` — Returns a new `Table` containing only rows that satisfy the provided condition.
-   - `aggregate(function, key)` — Applies an aggregation function (such as calculating average or maximum) to values associated with a given key.
+This README explains each part in detail.
 
-## Operations Performed in the Program
+---
 
-The program prints:
-1. The average temperature of all cities.
-2. All cities located in Germany.
-3. All cities located in Spain with a temperature above 12°C.
-4. The total number of unique countries present in the dataset.
-5. The average temperature of cities in Germany.
-6. The maximum temperature among cities in Italy.
+##  1. DataLoader Class
 
-## Example CSV Format (Cities.csv)
+### **Purpose**
+To load CSV data from a specified directory and convert it into a list of dictionaries where each row becomes a dictionary.
 
-city,country,temperature
-Berlin,Germany,10
-Munich,Germany,8
-Madrid,Spain,14
-Barcelona,Spain,13
-Rome,Italy,18
-Milan,Italy,15
+### **Key Features**
+- Automatically resolves the directory where your Python file is located.
+- Allows setting a custom base path for loading files.
+- Converts CSV rows into dictionaries using `csv.DictReader`.
 
-## Requirements
+### **Important Methods**
 
-- Python 3.8 or higher
-- No external libraries required (only built-in modules)
+#### **`__init__(self, base_path=None)`**
+- If `base_path` is not provided, it automatically sets the directory of the script as the working path.
+- If provided, it converts the custom path into a valid `Path` object.
 
-## How to Run
+#### **`load_csv(self, filename)`**
+- Joins the base path with the filename.
+- Opens the CSV file safely.
+- Reads the file and loads each row as a dictionary.
+- Returns a list of dictionaries containing your data.
 
-Make sure you are in the project directory, then run:
+---
 
-python main.py
+##  2. Table Class
+
+This class is designed to help process lists of dictionaries like a simple dataset.
+
+### **Key Abilities**
+- Print rows cleanly.
+- Filter data using flexible lambda conditions.
+- Return new Table objects for method chaining.
+- Perform aggregations such as min or max.
+
+### **Important Methods**
+
+#### **`print_table(self, n=10)`**
+- Prints the first `n` rows.
+- Helps check loaded data before processing.
+
+#### **`filter(self, condition)`**
+- Accepts a lambda function (e.g., `lambda x: x['EU'] == 'yes'`)
+- Returns a **new Table instance** with only matching rows.
+- Allows chaining:
+  ```python
+  table.filter(...).filter(...)
+  ```
+
+#### **`aggregate(self, func, column)`**
+- Extracts column values.
+- Applies a function (e.g., `min`, `max`, `sum`).
+- Returns the computed result.
+
+---
+
+##  3. Example Usage in the Script
+
+The example section shows how to use the module:
+
+### **1. Load data**
+```python
+my_loader = DataLoader()
+my_table1 = Table(my_loader.load_csv("cities.csv"))
+```
+
+### **2. Preview a portion of the table**
+```python
+my_table1.print_table(5)
+```
+
+### **3. Filter example**
+```python
+my_table_filtered = my_table1.filter(lambda x: x['EU'] == 'no')
+```
+This returns only non‑EU countries.
+
+### **4. Multi‑step filtering**
+```python
+my_table3_filtered = (
+    my_table3
+    .filter(lambda x: x['EU'] == 'yes')
+    .filter(lambda x: x['coastline'] == 'no')
+)
+```
+
+### **5. Aggregation**
+```python
+min_temp = my_table3_filtered.aggregate(lambda x: min(x), 'temperature')
+max_temp = my_table3_filtered.aggregate(lambda x: max(x), 'temperature')
+```
+
+---
+
+##  Project Structure
+
+```
+data_processing.py
+README.md
+your_csv_files/
+```
+
+Place all your CSV files inside `your_csv_files/` or the same folder as the script.
+
+---
+
+##  Running the Script
+
+Use:
+
+```bash
+python3 data_processing.py
+```
+
+The script will:
+- Load the CSV files
+- Filter according to provided conditions
+- Print results
+- Compute min/max temperatures for required cases
+
+---
+
+##  Requirements
+
+- Python **3.8+**
+- No external packages required
+
+---
+
+##  Author
+This README was generated with expanded explanations for clarity based on your request.
